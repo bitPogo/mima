@@ -5,7 +5,6 @@
  */
 
 import tech.antibytes.gradle.configuration.apple.ensureAppleDeviceCompatibility
-import tech.antibytes.gradle.configuration.sourcesets.setupAndroidTest
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import tech.antibytes.gradle.configuration.sourcesets.nativeCoroutine
 
@@ -14,7 +13,7 @@ plugins {
     alias(antibytesCatalog.plugins.gradle.antibytes.androidLibraryConfiguration)
     alias(antibytesCatalog.plugins.gradle.antibytes.coverage)
 
-    alias(libs.plugins.kmock)
+    alias(antibytesCatalog.plugins.kmock)
 }
 
 val projectPackage = "tech.antibytes.lib"
@@ -34,15 +33,15 @@ kmock {
 }
 
 kotlin {
-    android()
+    androidTarget()
 
     jvm()
 
     js(IR) {
         compilations {
             this.forEach {
-                it.compileKotlinTask.kotlinOptions.sourceMap = true
-                it.compileKotlinTask.kotlinOptions.metaInfo = true
+                it.compileTaskProvider.get().kotlinOptions.sourceMap = true
+                it.compileTaskProvider.get().kotlinOptions.metaInfo = true
 
                 if (it.name == "main") {
                     it.compileKotlinTask.kotlinOptions.main = "call"
@@ -78,10 +77,10 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(antibytesCatalog.common.test.kotlin.core)
-                implementation(libs.testUtils.core)
-                implementation(libs.testUtils.annotations)
-                implementation(libs.kfixture)
-                implementation(libs.kmock)
+                implementation(antibytesCatalog.testUtils.core)
+                implementation(antibytesCatalog.testUtils.annotations)
+                implementation(antibytesCatalog.kfixture)
+                implementation(antibytesCatalog.kmock)
             }
         }
 
@@ -91,8 +90,7 @@ kotlin {
             }
         }
 
-        setupAndroidTest()
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation(antibytesCatalog.android.test.junit.core)
                 implementation(antibytesCatalog.jvm.test.kotlin.junit4)
